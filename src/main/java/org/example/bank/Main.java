@@ -8,11 +8,12 @@ import org.example.bank.model.Account;
 import org.example.bank.model.Bank;
 import org.example.bank.model.Transaction;
 import org.example.bank.service.AccountService;
+import org.example.bank.system.BankSystem;
 
 public class Main {
     public static void main(String[] args) {
         try {
-            Bank bank = new Bank("Student Bank");
+            Bank bank = BankSystem.getInstance().getBank();
             AccountService accountService = new AccountService(bank);
             AccountFactory accountFactory = new AccountFactory();
 
