@@ -1,11 +1,10 @@
 package org.example.bank;
 
 import org.example.bank.exception.BankException;
+import org.example.bank.factory.AccountFactory;
+import org.example.bank.factory.AccountType;
 import org.example.bank.model.Account;
 import org.example.bank.model.Bank;
-import org.example.bank.model.CreditAccount;
-import org.example.bank.model.DebitAccount;
-import org.example.bank.model.SavingsAccount;
 import org.example.bank.model.Transaction;
 import org.example.bank.service.AccountService;
 
@@ -14,10 +13,28 @@ public class Main {
         try {
             Bank bank = new Bank("Student Bank");
             AccountService accountService = new AccountService(bank);
+            AccountFactory accountFactory = new AccountFactory();
 
-            accountService.addAccount(new DebitAccount("UA001", "Ivan Petrenko", 1000));
-            accountService.addAccount(new CreditAccount("UA002", "Olena Shevchenko", 500, 1000));
-            accountService.addAccount(new SavingsAccount("UA003", "Andrii Bondarenko", 2000, 0.05));
+            accountService.addAccount(accountFactory.createAccount(
+                    AccountType.DEBIT,
+                    "UA001",
+                    "Ivan Petrenko",
+                    1000
+            ));
+
+            accountService.addAccount(accountFactory.createAccount(
+                    AccountType.CREDIT,
+                    "UA002",
+                    "Olena Shevchenko",
+                    500
+            ));
+
+            accountService.addAccount(accountFactory.createAccount(
+                    AccountType.SAVINGS,
+                    "UA003",
+                    "Andrii Bondarenko",
+                    2000
+            ));
 
             accountService.deposit("UA001", 300);
             accountService.withdraw("UA002", 1200);
