@@ -59,16 +59,18 @@ public class Main {
     }
 
     private static void printAccount(Account account) {
-        System.out.println(account.getAccountNumber() + " | " +
-                account.getOwnerName() + " | balance: " +
+        System.out.printf("%s | %s | balance: %.2f%n",
+                account.getAccountNumber(),
+                account.getOwnerName(),
                 account.getBalance());
     }
 
     private static void printTransaction(Transaction transaction) {
-        System.out.println(transaction.getDateTime() + " | " +
-                transaction.getType() + " | from: " +
-                transaction.getFromAccountNumber() + " | to: " +
-                transaction.getToAccountNumber() + " | amount: " +
+        System.out.printf("%s | %s | from: %s | to: %s | amount: %.2f%n",
+                transaction.getDateTime(),
+                transaction.getType(),
+                transaction.getFromAccountNumber(),
+                transaction.getToAccountNumber(),
                 transaction.getAmount());
     }
 }
