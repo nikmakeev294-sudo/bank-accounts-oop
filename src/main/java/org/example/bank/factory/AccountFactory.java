@@ -6,19 +6,30 @@ import org.example.bank.model.DebitAccount;
 import org.example.bank.model.SavingsAccount;
 
 public class AccountFactory {
-    private static final double DEFAULT_CREDIT_LIMIT = 1000;
-    private static final double DEFAULT_INTEREST_RATE = 0.05;
-
-    public Account createAccount(AccountType type, String accountNumber, String ownerName, double initialBalance) {
-        switch (type) {
+    public Account createAccount(AccountData data) {
+        switch (data.getType()) {
             case DEBIT:
-                return new DebitAccount(accountNumber, ownerName, initialBalance);
+                return new DebitAccount(
+                        data.getAccountNumber(),
+                        data.getOwnerName(),
+                        data.getInitialBalance()
+                );
             case CREDIT:
-                return new CreditAccount(accountNumber, ownerName, initialBalance, DEFAULT_CREDIT_LIMIT);
+                return new CreditAccount(
+                        data.getAccountNumber(),
+                        data.getOwnerName(),
+                        data.getInitialBalance(),
+                        data.getCreditLimit()
+                );
             case SAVINGS:
-                return new SavingsAccount(accountNumber, ownerName, initialBalance, DEFAULT_INTEREST_RATE);
+                return new SavingsAccount(
+                        data.getAccountNumber(),
+                        data.getOwnerName(),
+                        data.getInitialBalance(),
+                        data.getInterestRate()
+                );
             default:
-                throw new IllegalArgumentException("Unknown account type: " + type);
+                throw new IllegalArgumentException("Unknown account type: " + data.getType());
         }
     }
 }
