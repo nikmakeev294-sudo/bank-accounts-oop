@@ -6,6 +6,7 @@ import org.example.bank.model.Bank;
 import org.example.bank.model.CreditAccount;
 import org.example.bank.model.DebitAccount;
 import org.example.bank.model.SavingsAccount;
+import org.example.bank.model.Transaction;
 import org.example.bank.service.AccountService;
 
 public class Main {
@@ -23,9 +24,17 @@ public class Main {
             accountService.transfer("UA003", "UA001", 500);
 
             System.out.println("Bank: " + bank.getName());
+            System.out.println();
 
+            System.out.println("Accounts:");
             for (Account account : bank.getAccounts()) {
                 printAccount(account);
+            }
+
+            System.out.println();
+            System.out.println("Transactions:");
+            for (Transaction transaction : bank.getTransactions()) {
+                printTransaction(transaction);
             }
         } catch (BankException e) {
             System.out.println("Operation error: " + e.getMessage());
@@ -36,5 +45,13 @@ public class Main {
         System.out.println(account.getAccountNumber() + " | " +
                 account.getOwnerName() + " | balance: " +
                 account.getBalance());
+    }
+
+    private static void printTransaction(Transaction transaction) {
+        System.out.println(transaction.getDateTime() + " | " +
+                transaction.getType() + " | from: " +
+                transaction.getFromAccountNumber() + " | to: " +
+                transaction.getToAccountNumber() + " | amount: " +
+                transaction.getAmount());
     }
 }
