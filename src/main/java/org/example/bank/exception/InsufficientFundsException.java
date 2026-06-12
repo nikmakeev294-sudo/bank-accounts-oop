@@ -1,7 +1,7 @@
 package org.example.bank.exception;
 
 public class InsufficientFundsException extends BankException {
-    public InsufficientFundsException(double balance, double amount) {
-        super("Not enough money. Balance: " + balance + ", requested amount: " + amount);
+    public InsufficientFundsException(double availableAmount, double requestedAmount) {
+        super("Not enough money. Available: " + availableAmount + ", requested amount: " + requestedAmount);
     }
 }

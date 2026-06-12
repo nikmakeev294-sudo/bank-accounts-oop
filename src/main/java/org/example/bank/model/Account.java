@@ -1,9 +1,8 @@
 package org.example.bank.model;
 
-import org.example.bank.exception.InsufficientFundsException;
 import org.example.bank.exception.InvalidAmountException;
 
-public class Account {
+public abstract class Account {
     private final String accountNumber;
     private final String ownerName;
     private double balance;
@@ -35,17 +34,13 @@ public class Account {
         balance += amount;
     }
 
-    public void withdraw(double amount) {
-        validatePositiveAmount(amount);
+    public abstract void withdraw(double amount);
 
-        if (amount > balance) {
-            throw new InsufficientFundsException(balance, amount);
-        }
-
-        balance -= amount;
+    protected void changeBalance(double amount) {
+        balance += amount;
     }
 
-    private void validatePositiveAmount(double amount) {
+    protected void validatePositiveAmount(double amount) {
         if (amount <= 0) {
             throw new InvalidAmountException(amount);
         }
