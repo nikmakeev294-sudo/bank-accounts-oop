@@ -1,6 +1,10 @@
 package org.example.bank;
 
 import org.example.bank.exception.BankException;
+import org.example.bank.command.BankCommand;
+import org.example.bank.command.DepositCommand;
+import org.example.bank.command.TransferCommand;
+import org.example.bank.command.WithdrawCommand;
 import org.example.bank.factory.AccountFactory;
 import org.example.bank.factory.AccountType;
 import org.example.bank.factory.AccountData;
@@ -47,9 +51,13 @@ public class Main {
                             .build()
             ));
 
-            accountService.deposit("UA001", 300);
-            accountService.withdraw("UA002", 1200);
-            accountService.transfer("UA003", "UA001", 500);
+            BankCommand depositCommand = new DepositCommand(accountService, "UA001", 300);
+            BankCommand withdrawCommand = new WithdrawCommand(accountService, "UA002", 1200);
+            BankCommand transferCommand = new TransferCommand(accountService, "UA003", "UA001", 500);
+
+            depositCommand.execute();
+            withdrawCommand.execute();
+            transferCommand.execute();
 
             System.out.println("Bank: " + bank.getName());
             System.out.println();
