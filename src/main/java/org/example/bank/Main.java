@@ -11,6 +11,7 @@ import org.example.bank.factory.AccountData;
 import org.example.bank.model.Account;
 import org.example.bank.model.Bank;
 import org.example.bank.model.Transaction;
+import org.example.bank.observer.ConsoleTransactionObserver;
 import org.example.bank.service.AccountService;
 import org.example.bank.system.BankSystem;
 import org.example.bank.strategy.PercentFeeStrategy;
@@ -20,8 +21,9 @@ public class Main {
         try {
             Bank bank = BankSystem.getInstance().getBank();
             AccountService accountService = new AccountService(bank, new PercentFeeStrategy(0.01));
+            accountService.addObserver(new ConsoleTransactionObserver());
             AccountFactory accountFactory = new AccountFactory();
-
+           
             accountService.addAccount(accountFactory.createAccount(
                     new AccountData.AccountBuilder()
                             .type(AccountType.DEBIT)
