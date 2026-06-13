@@ -1,77 +1,35 @@
 package org.example.bank;
 
 import org.example.bank.exception.BankException;
-import org.example.bank.command.BankCommand;
-import org.example.bank.command.DepositCommand;
-import org.example.bank.command.TransferCommand;
-import org.example.bank.command.WithdrawCommand;
-import org.example.bank.factory.AccountFactory;
+import org.example.bank.facade.BankFacade;
 import org.example.bank.factory.AccountType;
-import org.example.bank.factory.AccountData;
 import org.example.bank.model.Account;
-import org.example.bank.model.Bank;
 import org.example.bank.model.Transaction;
-import org.example.bank.observer.ConsoleTransactionObserver;
-import org.example.bank.service.AccountService;
-import org.example.bank.system.BankSystem;
-import org.example.bank.strategy.PercentFeeStrategy;
 
 public class Main {
     public static void main(String[] args) {
         try {
-            Bank bank = BankSystem.getInstance().getBank();
-            AccountService accountService = new AccountService(bank, new PercentFeeStrategy(0.01));
-            accountService.addObserver(new ConsoleTransactionObserver());
-            AccountFactory accountFactory = new AccountFactory();
-           
-            accountService.addAccount(accountFactory.createAccount(
-                    new AccountData.AccountBuilder()
-                            .type(AccountType.DEBIT)
-                            .accountNumber("UA001")
-                            .ownerName("Ivan Petrenko")
-                            .initialBalance(1000)
-                            .build()
-            ));
+            BankFacade bankFacade = new BankFacade();
 
-            accountService.addAccount(accountFactory.createAccount(
-                    new AccountData.AccountBuilder()
-                            .type(AccountType.CREDIT)
-                            .accountNumber("UA002")
-                            .ownerName("Olena Shevchenko")
-                            .initialBalance(500)
-                            .creditLimit(1000)
-                            .build()
-            ));
+            bankFacade.createAccount(AccountType.DEBIT, "UA001", "Ivan Petrenko", 1000);
+            bankFacade.createCreditAccount("UA002", "Olena Shevchenko", 500, 1000);
+            bankFacade.createSavingsAccount("UA003", "Andrii Bondarenko", 2000, 0.05);
 
-            accountService.addAccount(accountFactory.createAccount(
-                    new AccountData.AccountBuilder()
-                            .type(AccountType.SAVINGS)
-                            .accountNumber("UA003")
-                            .ownerName("Andrii Bondarenko")
-                            .initialBalance(2000)
-                            .interestRate(0.05)
-                            .build()
-            ));
+            bankFacade.deposit("UA001", 300);
+            bankFacade.withdraw("UA002", 1200);
+            bankFacade.transfer("UA003", "UA001", 500);
 
-            BankCommand depositCommand = new DepositCommand(accountService, "UA001", 300);
-            BankCommand withdrawCommand = new WithdrawCommand(accountService, "UA002", 1200);
-            BankCommand transferCommand = new TransferCommand(accountService, "UA003", "UA001", 500);
-
-            depositCommand.execute();
-            withdrawCommand.execute();
-            transferCommand.execute();
-
-            System.out.println("Bank: " + bank.getName());
+            System.out.println("Bank: " + bankFacade.getBankName());
             System.out.println();
 
             System.out.println("Accounts:");
-            for (Account account : bank.getAccounts()) {
+            for (Account account : bankFacade.getAccounts()) {
                 printAccount(account);
             }
 
             System.out.println();
             System.out.println("Transactions:");
-            for (Transaction transaction : bank.getTransactions()) {
+            for (Transaction transaction : bankFacade.getTransactions()) {
                 printTransaction(transaction);
             }
         } catch (BankException e) {
