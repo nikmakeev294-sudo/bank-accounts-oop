@@ -5,13 +5,16 @@ import org.example.bank.model.Account;
 import org.example.bank.model.Bank;
 import org.example.bank.model.Transaction;
 import org.example.bank.model.TransactionType;
+import org.example.bank.strategy.FeeStrategy;
 
 public class AccountService {
     private final Bank bank;
+    private final FeeStrategy feeStrategy;
 
-    public AccountService(Bank bank) {
-        this.bank = bank;
-    }
+    public AccountService(Bank bank, FeeStrategy feeStrategy) {
+    this.bank = bank;
+    this.feeStrategy = feeStrategy;
+}
 
     public void addAccount(Account account) {
         bank.addAccount(account);
@@ -55,7 +58,10 @@ public class AccountService {
         Account fromAccount = findAccountByNumber(fromAccountNumber);
         Account toAccount = findAccountByNumber(toAccountNumber);
 
-        fromAccount.withdraw(amount);
+        double fee = feeStrategy.calculateFee(amount);
+        double totalAmount = amount + fee;
+
+        fromAccount.withdraw(totalAmount);
         toAccount.deposit(amount);
 
         bank.addTransaction(new Transaction(

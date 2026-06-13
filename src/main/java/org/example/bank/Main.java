@@ -9,12 +9,13 @@ import org.example.bank.model.Bank;
 import org.example.bank.model.Transaction;
 import org.example.bank.service.AccountService;
 import org.example.bank.system.BankSystem;
+import org.example.bank.strategy.PercentFeeStrategy;
 
 public class Main {
     public static void main(String[] args) {
         try {
             Bank bank = BankSystem.getInstance().getBank();
-            AccountService accountService = new AccountService(bank);
+            AccountService accountService = new AccountService(bank, new PercentFeeStrategy(0.01));
             AccountFactory accountFactory = new AccountFactory();
 
             accountService.addAccount(accountFactory.createAccount(
