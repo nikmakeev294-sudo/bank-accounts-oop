@@ -1,23 +1,22 @@
 package org.example.bank;
 
+import org.example.bank.exception.AccountNotFoundException;
 import org.example.bank.exception.InsufficientFundsException;
+import org.example.bank.exception.InvalidAmountException;
 import org.example.bank.model.Bank;
+import org.example.bank.model.CreditAccount;
 import org.example.bank.model.DebitAccount;
 import org.example.bank.service.AccountService;
 import org.example.bank.strategy.NoFeeStrategy;
 import org.example.bank.strategy.PercentFeeStrategy;
+import org.junit.jupiter.api.Test;
 
-public class AccountServiceTest {
-    public static void main(String[] args) {
-        testDeposit();
-        testWithdraw();
-        testWithdrawWithNotEnoughMoney();
-        testTransferWithFee();
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-        System.out.println("All tests passed.");
-    }
-
-    private static void testDeposit() {
+class AccountServiceTest {
+    @Test
+    void depositShouldIncreaseBalance() {
         Bank bank = new Bank("Test Bank");
         AccountService accountService = new AccountService(bank, new NoFeeStrategy());
 
@@ -25,10 +24,11 @@ public class AccountServiceTest {
         accountService.deposit("UA001", 500);
 
         double balance = accountService.findAccountByNumber("UA001").getBalance();
-        assertEquals(1500, balance, "Deposit should increase balance");
+        assertEquals(1500, balance, 0.0001);
     }
 
-    private static void testWithdraw() {
+    @Test
+    void withdrawShouldDecreaseBalance() {
         Bank bank = new Bank("Test Bank");
         AccountService accountService = new AccountService(bank, new NoFeeStrategy());
 
@@ -36,24 +36,22 @@ public class AccountServiceTest {
         accountService.withdraw("UA001", 300);
 
         double balance = accountService.findAccountByNumber("UA001").getBalance();
-        assertEquals(700, balance, "Withdraw should decrease balance");
+        assertEquals(700, balance, 0.0001);
     }
 
-    private static void testWithdrawWithNotEnoughMoney() {
+    @Test
+    void withdrawShouldThrowExceptionWhenNotEnoughMoney() {
         Bank bank = new Bank("Test Bank");
         AccountService accountService = new AccountService(bank, new NoFeeStrategy());
 
         accountService.addAccount(new DebitAccount("UA001", "Test User", 1000));
 
-        try {
-            accountService.withdraw("UA001", 1500);
-            throw new AssertionError("Expected InsufficientFundsException");
-        } catch (InsufficientFundsException e) {
-            // expected result
-        }
+        assertThrows(InsufficientFundsException.class,
+                () -> accountService.withdraw("UA001", 1500));
     }
 
-    private static void testTransferWithFee() {
+    @Test
+    void transferShouldApplyFee() {
         Bank bank = new Bank("Test Bank");
         AccountService accountService = new AccountService(bank, new PercentFeeStrategy(0.01));
 
@@ -65,13 +63,39 @@ public class AccountServiceTest {
         double firstBalance = accountService.findAccountByNumber("UA001").getBalance();
         double secondBalance = accountService.findAccountByNumber("UA002").getBalance();
 
-        assertEquals(899, firstBalance, "Transfer should withdraw amount with fee");
-        assertEquals(100, secondBalance, "Transfer should deposit only transfer amount");
+        assertEquals(899, firstBalance, 0.0001);
+        assertEquals(100, secondBalance, 0.0001);
     }
 
-    private static void assertEquals(double expected, double actual, String message) {
-        if (Math.abs(expected - actual) > 0.0001) {
-            throw new AssertionError(message + ". Expected: " + expected + ", actual: " + actual);
-        }
+    @Test
+    void depositShouldThrowExceptionWhenAmountIsInvalid() {
+        Bank bank = new Bank("Test Bank");
+        AccountService accountService = new AccountService(bank, new NoFeeStrategy());
+
+        accountService.addAccount(new DebitAccount("UA001", "Test User", 1000));
+
+        assertThrows(InvalidAmountException.class,
+                () -> accountService.deposit("UA001", -100));
+    }
+
+    @Test
+    void operationShouldThrowExceptionWhenAccountNotFound() {
+        Bank bank = new Bank("Test Bank");
+        AccountService accountService = new AccountService(bank, new NoFeeStrategy());
+
+        assertThrows(AccountNotFoundException.class,
+                () -> accountService.deposit("UNKNOWN", 100));
+    }
+
+    @Test
+    void creditAccountShouldAllowBalanceWithinCreditLimit() {
+        Bank bank = new Bank("Test Bank");
+        AccountService accountService = new AccountService(bank, new NoFeeStrategy());
+
+        accountService.addAccount(new CreditAccount("UA001", "Credit User", 500, 1000));
+        accountService.withdraw("UA001", 1200);
+
+        double balance = accountService.findAccountByNumber("UA001").getBalance();
+        assertEquals(-700, balance, 0.0001);
     }
 }

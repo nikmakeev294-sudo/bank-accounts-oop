@@ -8,9 +8,9 @@ import org.example.bank.model.Transaction;
 
 public class Main {
     public static void main(String[] args) {
-        try {
-            BankFacade bankFacade = new BankFacade();
+        BankFacade bankFacade = new BankFacade();
 
+        try {
             bankFacade.createAccount(AccountType.DEBIT, "UA001", "Ivan Petrenko", 1000);
             bankFacade.createCreditAccount("UA002", "Olena Shevchenko", 500, 1000);
             bankFacade.createSavingsAccount("UA003", "Andrii Bondarenko", 2000, 0.05);
@@ -19,19 +19,35 @@ public class Main {
             bankFacade.withdraw("UA002", 1200);
             bankFacade.transfer("UA003", "UA001", 500);
 
-            System.out.println("Bank: " + bankFacade.getBankName());
-            System.out.println();
+            printBankInfo(bankFacade);
+            demonstrateInvalidOperation(bankFacade);
+        } catch (BankException e) {
+            System.out.println("Operation error: " + e.getMessage());
+        }
+    }
 
-            System.out.println("Accounts:");
-            for (Account account : bankFacade.getAccounts()) {
-                printAccount(account);
-            }
+    private static void printBankInfo(BankFacade bankFacade) {
+        System.out.println("Bank: " + bankFacade.getBankName());
+        System.out.println();
 
-            System.out.println();
-            System.out.println("Transactions:");
-            for (Transaction transaction : bankFacade.getTransactions()) {
-                printTransaction(transaction);
-            }
+        System.out.println("Accounts:");
+        for (Account account : bankFacade.getAccounts()) {
+            printAccount(account);
+        }
+
+        System.out.println();
+        System.out.println("Transactions:");
+        for (Transaction transaction : bankFacade.getTransactions()) {
+            printTransaction(transaction);
+        }
+    }
+
+    private static void demonstrateInvalidOperation(BankFacade bankFacade) {
+        System.out.println();
+        System.out.println("Exception demo:");
+
+        try {
+            bankFacade.withdraw("UA001", 100000);
         } catch (BankException e) {
             System.out.println("Operation error: " + e.getMessage());
         }

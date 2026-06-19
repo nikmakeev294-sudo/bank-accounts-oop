@@ -6,10 +6,10 @@ import org.example.bank.model.Bank;
 import org.example.bank.model.Transaction;
 import org.example.bank.model.TransactionType;
 import org.example.bank.observer.TransactionObserver;
+import org.example.bank.strategy.FeeStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.example.bank.strategy.FeeStrategy;
 
 public class AccountService {
     private final Bank bank;
@@ -17,20 +17,20 @@ public class AccountService {
     private final List<TransactionObserver> observers;
 
     public AccountService(Bank bank, FeeStrategy feeStrategy) {
-    this.bank = bank;
-    this.feeStrategy = feeStrategy;
-    this.observers = new ArrayList<>();
-}
-
-public void addObserver(TransactionObserver observer) {
-    observers.add(observer);
-}
-
-private void notifyObservers(Transaction transaction) {
-    for (TransactionObserver observer : observers) {
-        observer.update(transaction);
+        this.bank = bank;
+        this.feeStrategy = feeStrategy;
+        this.observers = new ArrayList<>();
     }
-}
+
+    public void addObserver(TransactionObserver observer) {
+        observers.add(observer);
+    }
+
+    private void notifyObservers(Transaction transaction) {
+        for (TransactionObserver observer : observers) {
+            observer.update(transaction);
+        }
+    }
 
     public void addAccount(Account account) {
         bank.addAccount(account);
@@ -51,10 +51,10 @@ private void notifyObservers(Transaction transaction) {
         account.deposit(amount);
 
         Transaction transaction = new Transaction(
-        TransactionType.DEPOSIT,
-        null,
-        accountNumber,
-        amount
+                TransactionType.DEPOSIT,
+                null,
+                accountNumber,
+                amount
         );
 
         bank.addTransaction(transaction);
@@ -87,10 +87,10 @@ private void notifyObservers(Transaction transaction) {
         toAccount.deposit(amount);
 
         Transaction transaction = new Transaction(
-        TransactionType.TRANSFER,
-        fromAccountNumber,
-        toAccountNumber,
-        amount
+                TransactionType.TRANSFER,
+                fromAccountNumber,
+                toAccountNumber,
+                amount
         );
 
         bank.addTransaction(transaction);

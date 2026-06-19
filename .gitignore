@@ -1,4 +1,18 @@
+# Compiled files
 out/
 target/
-.idea/
 *.class
+
+# Maven
+.mvn/
+mvnw
+mvnw.cmd
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
