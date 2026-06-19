@@ -1,0 +1,74 @@
+@startuml
+title Bank Accounts OOP - Domain Class Diagram
+
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+
+package "model" {
+    abstract class Account {
+        - accountNumber: String
+        - ownerName: String
+        - balance: double
+        + getAccountNumber(): String
+        + getOwnerName(): String
+        + getBalance(): double
+        + deposit(amount: double): void
+        + withdraw(amount: double): void
+    }
+
+    class DebitAccount {
+        + withdraw(amount: double): void
+    }
+
+    class CreditAccount {
+        - creditLimit: double
+        + getCreditLimit(): double
+        + withdraw(amount: double): void
+    }
+
+    class SavingsAccount {
+        - interestRate: double
+        + getInterestRate(): double
+        + addInterest(): void
+        + withdraw(amount: double): void
+    }
+
+    class Bank {
+        - name: String
+        - accounts: List<Account>
+        - transactions: List<Transaction>
+        + getName(): String
+        + addAccount(account: Account): void
+        + getAccounts(): List<Account>
+        + addTransaction(transaction: Transaction): void
+        + getTransactions(): List<Transaction>
+    }
+
+    class Transaction {
+        - type: TransactionType
+        - fromAccountNumber: String
+        - toAccountNumber: String
+        - amount: double
+        - dateTime: LocalDateTime
+        + getType(): TransactionType
+        + getFromAccountNumber(): String
+        + getToAccountNumber(): String
+        + getAmount(): double
+        + getDateTime(): LocalDateTime
+    }
+
+    enum TransactionType {
+        DEPOSIT
+        WITHDRAW
+        TRANSFER
+    }
+}
+
+Account <|-- DebitAccount
+Account <|-- CreditAccount
+Account <|-- SavingsAccount
+
+Bank "1  " o-- "  0..*" Account : aggregates
+Bank "1  " *-- "  0..*  " Transaction : contains
+Transaction ..> TransactionType : uses
+@enduml

@@ -1,0 +1,61 @@
+@startuml
+title Bank Accounts OOP - Operation Processing Diagram
+
+top to bottom direction
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+class BankFacade <<Facade>> {
+    + deposit(): void
+    + withdraw(): void
+    + transfer(): void
+}
+
+class AccountService {
+    - bank: Bank
+    - feeStrategy: FeeStrategy
+    - observers: List<TransactionObserver>
+    + addObserver(): void
+    + deposit(): void
+    + withdraw(): void
+    + transfer(): void
+}
+
+interface FeeStrategy <<Strategy>> {
+    + calculateFee(): double
+}
+
+class NoFeeStrategy {
+    + calculateFee(): double
+}
+
+class PercentFeeStrategy {
+    - percent: double
+    + calculateFee(): double
+}
+
+interface TransactionObserver <<Observer>> {
+    + update(): void
+}
+
+class ConsoleTransactionObserver {
+    + update(): void
+}
+
+class Bank
+class Transaction
+
+BankFacade -down-> AccountService : uses
+
+AccountService -left-> FeeStrategy : uses
+AccountService -right--> TransactionObserver : notify
+AccountService -down-> Bank : works with
+AccountService -down-> Transaction : creates
+
+FeeStrategy <|.. NoFeeStrategy
+FeeStrategy <|.. PercentFeeStrategy
+
+TransactionObserver <|.. ConsoleTransactionObserver
+ConsoleTransactionObserver -down-> Transaction : receives
+@enduml

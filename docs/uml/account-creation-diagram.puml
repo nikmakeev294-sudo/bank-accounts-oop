@@ -1,0 +1,60 @@
+@startuml
+title Bank Accounts OOP - Account Creation Diagram
+
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+
+package "factory" {
+    class AccountFactory <<Factory>> {
+        + createAccount(data: AccountData): Account
+    }
+
+    class AccountData {
+        - type: AccountType
+        - accountNumber: String
+        - ownerName: String
+        - initialBalance: double
+        - creditLimit: double
+        - interestRate: double
+        + getType(): AccountType
+        + getAccountNumber(): String
+        + getOwnerName(): String
+        + getInitialBalance(): double
+        + getCreditLimit(): double
+        + getInterestRate(): double
+    }
+
+    class AccountBuilder <<Builder>> {
+        + type(type: AccountType): AccountBuilder
+        + accountNumber(accountNumber: String): AccountBuilder
+        + ownerName(ownerName: String): AccountBuilder
+        + initialBalance(initialBalance: double): AccountBuilder
+        + creditLimit(creditLimit: double): AccountBuilder
+        + interestRate(interestRate: double): AccountBuilder
+        + build(): AccountData
+    }
+
+    enum AccountType {
+        DEBIT
+        CREDIT
+        SAVINGS
+    }
+}
+
+package "model" {
+    abstract class Account
+    class DebitAccount
+    class CreditAccount
+    class SavingsAccount
+}
+
+Account <|-- DebitAccount
+Account <|-- CreditAccount
+Account <|-- SavingsAccount
+
+AccountData "1  " *-- "1" AccountBuilder : built by
+AccountData --> AccountType : has type
+AccountFactory ..> AccountData : uses
+AccountFactory ..> AccountType : checks type
+AccountFactory ..> Account : creates
+@enduml
