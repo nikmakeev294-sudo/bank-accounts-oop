@@ -4,11 +4,14 @@ import org.example.bank.command.BankCommand;
 import org.example.bank.command.DepositCommand;
 import org.example.bank.command.TransferCommand;
 import org.example.bank.command.WithdrawCommand;
+import org.example.bank.decorator.TermDepositAccountDecorator;
+import org.example.bank.exception.AccountNotFoundException;
 import org.example.bank.factory.AccountData;
 import org.example.bank.factory.AccountFactory;
 import org.example.bank.factory.AccountType;
 import org.example.bank.model.Account;
 import org.example.bank.model.Bank;
+import org.example.bank.model.SavingsAccount;
 import org.example.bank.model.Transaction;
 import org.example.bank.observer.ConsoleTransactionObserver;
 import org.example.bank.service.AccountService;
@@ -64,6 +67,25 @@ public class BankFacade {
         accountService.addAccount(accountFactory.createAccount(accountData));
     }
 
+    public void createTermDepositAccount(String accountNumber, String ownerName,
+                                         double initialBalance, double annualInterestRate,
+                                         int termMonths) {
+        Account savingsAccount = new SavingsAccount(
+                accountNumber,
+                ownerName,
+                initialBalance,
+                annualInterestRate
+        );
+
+        Account termDepositAccount = new TermDepositAccountDecorator(
+                savingsAccount,
+                termMonths,
+                annualInterestRate
+        );
+
+        accountService.addAccount(termDepositAccount);
+    }
+
     public void deposit(String accountNumber, double amount) {
         BankCommand command = new DepositCommand(accountService, accountNumber, amount);
         command.execute();
@@ -79,6 +101,17 @@ public class BankFacade {
         command.execute();
     }
 
+    public void applyTermInterest(String accountNumber) {
+        Account account = findAccountByNumber(accountNumber);
+
+        if (account instanceof TermDepositAccountDecorator termDepositAccount) {
+            termDepositAccount.addInterestForTerm();
+            System.out.println(termDepositAccount.getTermMessage());
+        } else {
+            System.out.println("Account " + accountNumber + " is not a term deposit account.");
+        }
+    }
+
     public String getBankName() {
         return bank.getName();
     }
@@ -89,5 +122,15 @@ public class BankFacade {
 
     public List<Transaction> getTransactions() {
         return bank.getTransactions();
+    }
+
+    private Account findAccountByNumber(String accountNumber) {
+        for (Account account : bank.getAccounts()) {
+            if (account.getAccountNumber().equals(accountNumber)) {
+                return account;
+            }
+        }
+
+        throw new AccountNotFoundException(accountNumber);
     }
 }

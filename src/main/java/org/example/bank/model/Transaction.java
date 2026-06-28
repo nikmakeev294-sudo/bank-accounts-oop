@@ -1,5 +1,7 @@
 package org.example.bank.model;
 
+import org.example.bank.visitor.TransactionVisitor;
+
 import java.time.LocalDateTime;
 
 public class Transaction {
@@ -35,5 +37,13 @@ public class Transaction {
 
     public LocalDateTime getDateTime() {
         return dateTime;
+    }
+
+    public void accept(TransactionVisitor visitor) {
+        switch (type) {
+            case DEPOSIT -> visitor.visitDeposit(this);
+            case WITHDRAW -> visitor.visitWithdraw(this);
+            case TRANSFER -> visitor.visitTransfer(this);
+        }
     }
 }
